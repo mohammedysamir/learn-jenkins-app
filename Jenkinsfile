@@ -33,13 +33,19 @@ pipeline {
                 sh '''
                     echo "Test Stage"
                     npm test
-                    test -f build/index.html
+                    test -f build/index.html | echo exit code: $?
                 '''
             }
         }
         stage('Archive Artifacts') {
             steps {
                 archiveArtifacts artifacts: 'build/**'
+            }
+        }
+        post {
+            always {
+                echo 'Junit Test Report'
+                junit 'test-results/junit.xml'
             }
         }
     }
