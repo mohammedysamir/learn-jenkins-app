@@ -42,11 +42,11 @@ pipeline {
                 archiveArtifacts artifacts: 'build/**'
             }
         }
-        post {
+    }
+    post {
             always {
                 echo 'Junit Test Report'
                 junit 'test-results/junit.xml'
             }
         }
-    }
 }
