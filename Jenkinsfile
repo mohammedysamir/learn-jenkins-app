@@ -19,7 +19,20 @@ pipeline {
                 '''
             }
         }
-
+        stage('Test') {
+            agent {
+                docker {
+                    image 'node:18-alpine'
+                    reuseNode true
+                }
+            }
+            steps {
+                sh '''
+                    echo "Running tests..."
+                    npm test
+                '''
+            }
+        }
         stage('Archive Artifacts') {
             steps {
                 archiveArtifacts artifacts: 'build/**'
