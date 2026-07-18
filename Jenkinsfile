@@ -28,7 +28,7 @@ pipeline {
             }
             steps {
                 sh '''
-                    echo "Running tests..."
+                    echo "Test Stage"
                     npm test
                 '''
             }
