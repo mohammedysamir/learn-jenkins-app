@@ -2,6 +2,7 @@ pipeline {
     agent any
     environment {
         NODE_IMAGE = 'node:18-alpine'
+        PLAYWRIGHT_IMAGE = 'mcr.microsoft.com/playwright:v1.61.0-noble'
     }
     stages {
         stage('Build') {
@@ -37,6 +38,22 @@ pipeline {
                 '''
             }
         }
+        stage('E2E') {
+            agent {
+                docker {
+                    image "$PLAYWRIGHT_IMAGE"
+                    reuseNode true
+                }
+            }
+            steps {
+                sh '''
+                    echo "E2E Stage"
+                    npm install -g serve
+                    serve -s build
+                    npx playwright test
+                '''
+            }
+        }
         stage('Archive Artifacts') {
             steps {
                 archiveArtifacts artifacts: 'build/**'
@@ -48,5 +65,5 @@ pipeline {
                 echo 'Junit Test Report'
                 junit 'test-results/junit.xml'
             }
-        }
+    }
 }
