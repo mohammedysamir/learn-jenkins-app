@@ -58,6 +58,20 @@ pipeline {
                 }
             }
         }
+        stage('Lint') {
+            agent {
+                docker {
+                    image "$NODE_IMAGE"
+                    reuseNode true
+                }
+            }
+            steps {
+                sh '''
+                    echo "Lint Stage"
+                    npm run lint
+                '''
+            }
+        }
         stage('Archive Artifacts') {
             steps {
                 archiveArtifacts artifacts: 'build/**'
