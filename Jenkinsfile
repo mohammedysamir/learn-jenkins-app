@@ -50,12 +50,13 @@ pipeline {
                     steps {
                         sh '''
                             echo "E2E Stage"
-                            # 1. Start serve in the background (&) listening on port 3000
-                            npx serve -s build -l 3000 &
-                            
-                            # 2. Wait a few seconds for serve to boot up
-                            sleep 5
-                            
+
+                            # 1. Start serve listening on 0.0.0.0:3000 in background
+                            npx serve -s build -l tcp://0.0.0.0:3000 &
+
+                            # 2. Give npx enough time to download & launch serve (15s)
+                            sleep 15
+
                             # 3. Run Playwright tests
                             npx playwright test --reporter=html
                         '''
