@@ -17,7 +17,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test --testResultsProcessor=\"jest-junit\"",
     "eject": "react-scripts eject",
-    "lint": "eslint ."
+    "lint": "eslint src/ --fix"
   },
   "eslintConfig": {
     "extends": [
