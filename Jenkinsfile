@@ -23,36 +23,40 @@ pipeline {
                 '''
             }
         }
-        stage('Test') {
-            agent {
-                docker {
-                    image "$NODE_IMAGE"
-                    reuseNode true
+        stage('Tests') {
+            parallel {
+                stage('Unit Tests') {
+                    agent {
+                        docker {
+                            image "$NODE_IMAGE"
+                            reuseNode true
+                        }
+                    }
+                    steps {
+                        sh '''
+                            echo "Unit Tests Stage"
+                            npm test
+                            test -f build/index.html | echo exit code: $?
+                        '''
+                    }
                 }
-            }
-            steps {
-                sh '''
-                    echo "Test Stage"
-                    npm test
-                    test -f build/index.html | echo exit code: $?
-                '''
-            }
-        }
-        stage('E2E') {
-            agent {
-                docker {
-                    image "$PLAYWRIGHT_IMAGE"
-                    reuseNode true
+                stage('E2E') {
+                    agent {
+                        docker {
+                            image "$PLAYWRIGHT_IMAGE"
+                            reuseNode true
+                        }
+                    }
+                    steps {
+                        sh '''
+                            echo "E2E Stage"
+                            npm install -g serve
+                            node_modules/serve -s build &
+                            sleep 10
+                            npx playwright test --reporter=html
+                        '''
+                    }
                 }
-            }
-            steps {
-                sh '''
-                    echo "E2E Stage"
-                    npm install -g serve
-                    node_modules/serve -s build &
-                    sleep 10
-                    npx playwright test --reporter=html
-                '''
             }
         }
         stage('Archive Artifacts') {
