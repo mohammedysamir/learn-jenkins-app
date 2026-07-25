@@ -2,7 +2,7 @@ pipeline {
     agent any
     environment {
         NODE_IMAGE = 'node:18-alpine'
-        PLAYWRIGHT_IMAGE = 'mcr.microsoft.com/playwright:v1.61.0-noble'
+        PLAYWRIGHT_IMAGE = 'mcr.microsoft.com/playwright:v1.39.0-jammy'
     }
     stages {
         stage('Build') {
