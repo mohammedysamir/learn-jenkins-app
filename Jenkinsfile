@@ -50,7 +50,6 @@ pipeline {
                     steps {
                         sh '''
                             echo "E2E Stage"
-                            npm install -g serve
                             npx serve -s build &
                             sleep 5
                             npx playwright test --reporter=html
@@ -66,10 +65,20 @@ pipeline {
         }
     }
     post {
-            always {
-                echo 'Test Reports'
-                junit 'jest-results/junit.xml'
-                publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, icon: '', keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright HTML Report', reportTitles: '', useWrapperFileDirectly: true])
-            }
+        always {
+            echo 'Test Reports'
+            junit 'jest-results/junit.xml'
+            publishHTML([
+                allowMissing: false,
+                alwaysLinkToLastBuild: false,
+                icon: '',
+                keepAll: false,
+                reportDir: 'playwright-report',
+                reportFiles: 'index.html',
+                reportName: 'Playwright HTML Report',
+                reportTitles: '',
+                useWrapperFileDirectly: true
+            ])
+        }
     }
 }
