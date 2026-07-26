@@ -84,6 +84,17 @@ pipeline {
             }
         }
     }
+    stage('Deploying') {
+        steps {
+            echo 'Deploying the project...'
+            sh '''
+                npm install netlify-cli -g
+                netlify --version
+                #netlify deploy --dir=build --prod --auth=$NETLIFY_AUTH_TOKEN --site=$NETLIFY_SITE_ID
+                echo "Deployment completed."
+            '''
+        }
+    }
     post {
         always {
             echo 'Test Reports'
