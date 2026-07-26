@@ -3,6 +3,7 @@ pipeline {
     environment {
         NODE_IMAGE = 'node:18-alpine'
         PLAYWRIGHT_IMAGE = 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+        NETLIFY_SITE_ID = '4ab594fa-4491-4474-9609-3f8edcf9c9b3'
     }
     stages {
         stage('Build') {
@@ -78,21 +79,21 @@ pipeline {
                 '''
             }
         }
+        stage('Deploying') {
+            steps {
+                echo 'Deploying the project...'
+                sh '''
+                    npm install netlify-cli@20.1.1
+                    node_modules/.bin/netlify --version
+                    #netlify deploy --dir=build --prod --auth=$NETLIFY_AUTH_TOKEN --site=$NETLIFY_SITE_ID
+                    echo "Deployment completed."
+                '''
+            }
+        }
         stage('Archive Artifacts') {
             steps {
                 archiveArtifacts artifacts: 'build/**'
             }
-        }
-    }
-    stage('Deploying') {
-        steps {
-            echo 'Deploying the project...'
-            sh '''
-                npm install netlify-cli@20.1.1
-                node_modules/.bin/netlify --version
-                #netlify deploy --dir=build --prod --auth=$NETLIFY_AUTH_TOKEN --site=$NETLIFY_SITE_ID
-                echo "Deployment completed."
-            '''
         }
     }
     post {
