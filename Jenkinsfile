@@ -88,7 +88,7 @@ pipeline {
         steps {
             echo 'Deploying the project...'
             sh '''
-                npm install netlify-cli
+                npm install netlify-cli@20.1.1
                 node_modules/.bin/netlify --version
                 #netlify deploy --dir=build --prod --auth=$NETLIFY_AUTH_TOKEN --site=$NETLIFY_SITE_ID
                 echo "Deployment completed."
