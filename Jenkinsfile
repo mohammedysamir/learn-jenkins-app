@@ -3,8 +3,6 @@ pipeline {
     environment {
         NODE_IMAGE = 'node:18-alpine'
         PLAYWRIGHT_IMAGE = 'mcr.microsoft.com/playwright:v1.39.0-jammy'
-        NETLIFY_SITE_ID = '4ab594fa-4491-4474-9609-3f8edcf9c9b3'
-        NETLIFY_AUTH_TOKEN = credentials('netlify-auth-token')
     }
     stages {
         stage('Build') {
@@ -87,13 +85,17 @@ pipeline {
                     reuseNode true
                 }
             }
+            environment {
+                VERCEL_PROJECT_ID = credential('vercel-simple-app-project-id')
+                VERCEL_TOKEN = credentials('vercel-auth-token')
+                VERCEL_ORG_ID = credential('vercel-team-id')
+            }
             steps {
                 echo 'Deploying the project...'
                 sh '''
-                    npm install netlify-cli@20.1.1
-                    node_modules/.bin/netlify --version
-                    node_modules/.bin/netlify status
-                    #netlify deploy --dir=build --prod --auth=$NETLIFY_AUTH_TOKEN --site=$NETLIFY_SITE_ID
+                    npm install vercel@latest
+                    npx vercel --version
+                    #npx vercel deploy --prod --token=$VERCEL_TOKEN --yes
                     echo "Deployment completed."
                 '''
             }
