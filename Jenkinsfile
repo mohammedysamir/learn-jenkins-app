@@ -45,20 +45,19 @@ pipeline {
                         docker {
                             image "$PLAYWRIGHT_IMAGE"
                             reuseNode true
+                            // Ensure port 3000 is open/mapped if needed inside the container
+                            args '-p 3000:3000'
                         }
                     }
                     steps {
+                        echo 'Running Playwright E2E Tests...'
                         sh '''
-                            echo "E2E Stage"
+                            # Verify the build directory exists in this container
+                            ls -la build
 
-                            # 1. Start serve listening on 0.0.0.0:3000 in background
-                            npx serve -s build -l tcp://0.0.0.0:3000 &
-
-                            # 2. Give npx enough time to download & launch serve (15s)
-                            sleep 15
-
-                            # 3. Run Playwright tests
-                            npx playwright test --reporter=html
+                            # Playwright automatically starts 'npx serve -s build -l 3000',
+                            # waits for http://127.0.0.1:3000 to be ready, and runs tests.
+                            npx playwright test
                         '''
                     }
                 }
