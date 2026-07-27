@@ -4,6 +4,7 @@ pipeline {
         NODE_IMAGE = 'node:18-alpine'
         PLAYWRIGHT_IMAGE = 'mcr.microsoft.com/playwright:v1.39.0-jammy'
         NETLIFY_SITE_ID = '4ab594fa-4491-4474-9609-3f8edcf9c9b3'
+        NETLIFY_AUTH_TOKEN = credentials('netlify-auth-token')
     }
     stages {
         stage('Build') {
@@ -85,6 +86,7 @@ pipeline {
                 sh '''
                     npm install netlify-cli@20.1.1
                     node_modules/.bin/netlify --version
+                    node_modules/.bin/netlify status
                     #netlify deploy --dir=build --prod --auth=$NETLIFY_AUTH_TOKEN --site=$NETLIFY_SITE_ID
                     echo "Deployment completed."
                 '''
