@@ -81,6 +81,12 @@ pipeline {
             }
         }
         stage('Deploying') {
+              agent {
+                docker {
+                    image "$NODE_IMAGE"
+                    reuseNode true
+                }
+            }
             steps {
                 echo 'Deploying the project...'
                 sh '''
