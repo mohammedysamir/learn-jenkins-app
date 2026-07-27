@@ -86,9 +86,9 @@ pipeline {
                 }
             }
             environment {
-                VERCEL_PROJECT_ID = credential('vercel-simple-app-project-id')
+                VERCEL_PROJECT_ID = credentials('vercel-simple-app-project-id')
                 VERCEL_TOKEN = credentials('vercel-auth-token')
-                VERCEL_ORG_ID = credential('vercel-team-id')
+                VERCEL_ORG_ID = credentials('vercel-team-id')
             }
             steps {
                 echo 'Deploying the project...'
