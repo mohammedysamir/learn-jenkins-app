@@ -81,7 +81,7 @@ pipeline {
             }
         }
         stage('Deploying') {
-              agent {
+            agent {
                 docker {
                     image "$NODE_IMAGE"
                     reuseNode true
