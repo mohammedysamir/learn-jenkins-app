@@ -94,7 +94,7 @@ pipeline {
                 sh '''
                     npm install vercel@latest
                     npx vercel --version
-                    #npx vercel deploy --prod --token=$VERCEL_TOKEN --yes
+                    npx vercel deploy  --prod --token=$VERCEL_TOKEN --yes
                     echo "Deployment completed."
                 '''
             }
