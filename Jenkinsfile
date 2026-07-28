@@ -142,7 +142,7 @@ pipeline {
                         alwaysLinkToLastBuild: false,
                         icon: '',
                         keepAll: false,
-                        reportDir: 'playwright-report',
+                        reportDir: 'playwright-e2e-report',
                         reportFiles: 'index.html',
                         reportName: 'Playwright Production HTML Report',
                         reportTitles: '',
