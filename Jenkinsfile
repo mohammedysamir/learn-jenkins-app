@@ -94,6 +94,28 @@ pipeline {
                 '''
             }
         }
+        stage('Deploying to Staging') {
+            agent {
+                docker {
+                    image "$NODE_IMAGE"
+                    reuseNode true
+                }
+            }
+            environment {
+                VERCEL_PROJECT_ID = 'prj_qdyHetTH5yH6VNQaZ0AahR67OCqk'
+                VERCEL_TOKEN = credentials('vercel-auth-token')
+                VERCEL_ORG_ID = credentials('vercel-team-id')
+            }
+            steps {
+                echo 'Deploying the project to Staging...'
+                sh '''
+                    npm install vercel@latest
+                    npx vercel --version
+                    npx vercel deploy --token=$VERCEL_TOKEN --yes
+                    echo "Deployment to staging is completed."
+                '''
+            }
+        }
         stage('Deploying') {
             agent {
                 docker {
