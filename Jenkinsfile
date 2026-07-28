@@ -62,6 +62,23 @@ pipeline {
                     }
                 }
             }
+            post {
+                always {
+                    echo 'Test Reports'
+                    junit 'jest-results/junit.xml'
+                    publishHTML([
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: false,
+                        icon: '',
+                        keepAll: false,
+                        reportDir: 'playwright-report',
+                        reportFiles: 'index.html',
+                        reportName: 'Playwright HTML Report',
+                        reportTitles: '',
+                        useWrapperFileDirectly: true
+                    ])
+                }
+            }
         }
         stage('Lint') {
             agent {
@@ -99,27 +116,45 @@ pipeline {
                 '''
             }
         }
+        stage('Production Post-Deployment Tests') {
+            agent {
+                docker {
+                    image "$NODE_IMAGE"
+                    image "$PLAYWRIGHT_IMAGE"
+                    reuseNode true
+                }
+            }
+            environment {
+                CI_ENVIRONMENT_URL = 'https://simple-web-app-nu.vercel.app'
+            }
+            steps {
+                echo 'Running Production Post-Deployment Tests...'
+
+                sh '''
+                    echo "Running tests against the deployed application..."
+                    npx playwright test --config=playwright.config.js
+                '''
+            }
+            post {
+                always {
+                    publishHTML([
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: false,
+                        icon: '',
+                        keepAll: false,
+                        reportDir: 'playwright-report',
+                        reportFiles: 'index.html',
+                        reportName: 'Playwright Production HTML Report',
+                        reportTitles: '',
+                        useWrapperFileDirectly: true
+                    ])
+                }
+            }
+        }
         stage('Archive Artifacts') {
             steps {
                 archiveArtifacts artifacts: 'build/**'
             }
-        }
-    }
-    post {
-        always {
-            echo 'Test Reports'
-            junit 'jest-results/junit.xml'
-            publishHTML([
-                allowMissing: false,
-                alwaysLinkToLastBuild: false,
-                icon: '',
-                keepAll: false,
-                reportDir: 'playwright-report',
-                reportFiles: 'index.html',
-                reportName: 'Playwright HTML Report',
-                reportTitles: '',
-                useWrapperFileDirectly: true
-            ])
         }
     }
 }
