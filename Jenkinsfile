@@ -57,7 +57,7 @@ pipeline {
 
                             # Playwright automatically starts 'npx serve -s build -l 3000',
                             # waits for http://127.0.0.1:3000 to be ready, and runs tests.
-                            npx playwright test
+                            npx playwright test --reporter=html
                         '''
                     }
                 }
@@ -154,7 +154,7 @@ pipeline {
 
                 sh '''
                     echo "Running tests against the deployed application..."
-                    npx playwright test --config=playwright.config.js
+                    npx playwright test --reporter=html --config=playwright.config.js
                 '''
             }
             post {
