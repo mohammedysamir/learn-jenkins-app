@@ -116,7 +116,16 @@ pipeline {
                 '''
             }
         }
-        stage('Deploying') {
+        stage('Approving to Deploy to Production') {
+            //manual approval to deploy to production with timeout 5 minutes to automatically cancel the deployment
+            agent any
+            steps {
+                timeout(time: 5, unit: 'MINUTES') {
+                    input message: 'Do you want to deploy to production?', ok: 'Deploy', submitter: 'admin'
+                }
+            }
+        }
+        stage('Deploying to Production') {
             agent {
                 docker {
                     image "$NODE_IMAGE"
