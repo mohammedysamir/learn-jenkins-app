@@ -111,9 +111,14 @@ pipeline {
                 sh '''
                     npm install vercel@latest
                     npx vercel --version
-                    npx vercel deploy --token=$VERCEL_TOKEN --yes > staging-deploy.json
-                    echo "Deployment to staging is completed."
+                    # vercel prints progress/inspect logs to stderr and ONLY the
+                    # deployment URL to stdout, so this file holds just the URL.
+                    npx vercel deploy --token=$VERCEL_TOKEN --yes > staging-url.txt
                 '''
+                script {
+                    env.STAGING_URL = sh(script: 'cat staging-url.txt', returnStdout: true).trim()
+                }
+                echo "Deployment to staging is completed: ${env.STAGING_URL}"
             }
         }
         stage('Approving to Deploy to Production') {
