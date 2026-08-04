@@ -94,6 +94,7 @@ pipeline {
                 }
             }
         }
+
         stage('Deploying to Staging') {
             agent {
                 docker {
@@ -111,8 +112,6 @@ pipeline {
                 sh '''
                     npm install vercel@latest
                     npx vercel --version
-                    # vercel prints progress/inspect logs to stderr and ONLY the
-                    # deployment URL to stdout, so this file holds just the URL.
                     npx vercel deploy --token=$VERCEL_TOKEN --yes > staging-url.txt
                 '''
                 script {
@@ -121,6 +120,43 @@ pipeline {
                 echo "Deployment to staging is completed: ${env.STAGING_URL}"
             }
         }
+
+        stage('Staging Post-Deployment Tests') {
+            agent {
+                docker {
+                    image "$NODE_IMAGE"
+                    image "$PLAYWRIGHT_IMAGE"
+                    reuseNode true
+                }
+            }
+            environment {
+                CI_ENVIRONMENT_URL = "${env.STAGING_URL}"
+            }
+            steps {
+                echo 'Running Staging Post-Deployment Tests...'
+
+                sh '''
+                    echo "Running tests against the staging-deployed application..."
+                    npx playwright test --reporter=html --config=playwright.config.js
+                '''
+            }
+            post {
+                always {
+                    publishHTML([
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: false,
+                        icon: '',
+                        keepAll: false,
+                        reportDir: 'playwright-report',
+                        reportFiles: 'index.html',
+                        reportName: 'Playwright Staging HTML Report',
+                        reportTitles: '',
+                        useWrapperFileDirectly: true
+                    ])
+                }
+            }
+        }
+
         stage('Approving to Deploy to Production') {
             //manual approval to deploy to production with timeout 5 minutes to automatically cancel the deployment
             agent any
@@ -147,9 +183,13 @@ pipeline {
                 sh '''
                     npm install vercel@latest
                     npx vercel --version
-                    npx vercel deploy  --prod --token=$VERCEL_TOKEN --yes
+                    npx vercel deploy  --prod --token=$VERCEL_TOKEN --yes > production-url.txt
                     echo "Deployment completed."
                 '''
+                script {
+                    env.PRODUCTION_URL = sh(script: 'cat production-url.txt', returnStdout: true).trim()
+                }
+                echo "Deployment to production is completed: ${env.PRODUCTION_URL}"
             }
         }
         stage('Production Post-Deployment Tests') {
@@ -161,7 +201,7 @@ pipeline {
                 }
             }
             environment {
-                CI_ENVIRONMENT_URL = 'https://simple-web-app-nu.vercel.app'
+                CI_ENVIRONMENT_URL = "${env.PRODUCTION_URL}"
             }
             steps {
                 echo 'Running Production Post-Deployment Tests...'
