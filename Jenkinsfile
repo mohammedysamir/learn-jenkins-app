@@ -23,6 +23,20 @@ pipeline {
                 '''
             }
         }
+        stage('Lint') {
+            agent {
+                docker {
+                    image "$NODE_IMAGE"
+                    reuseNode true
+                }
+            }
+            steps {
+                sh '''
+                    echo "Lint Stage"
+                    npm run lint
+                '''
+            }
+        }
         stage('Tests') {
             parallel {
                 stage('Unit Tests') {
@@ -80,20 +94,6 @@ pipeline {
                 }
             }
         }
-        stage('Lint') {
-            agent {
-                docker {
-                    image "$NODE_IMAGE"
-                    reuseNode true
-                }
-            }
-            steps {
-                sh '''
-                    echo "Lint Stage"
-                    npm run lint
-                '''
-            }
-        }
         stage('Deploying to Staging') {
             agent {
                 docker {
@@ -111,7 +111,7 @@ pipeline {
                 sh '''
                     npm install vercel@latest
                     npx vercel --version
-                    npx vercel deploy --token=$VERCEL_TOKEN --yes
+                    npx vercel deploy --token=$VERCEL_TOKEN --yes > staging-deploy.json
                     echo "Deployment to staging is completed."
                 '''
             }
