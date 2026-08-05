@@ -103,7 +103,7 @@ pipeline {
                 }
             }
             environment {
-                VERCEL_PROJECT_ID = 'prj_qdyHetTH5yH6VNQaZ0AahR67OCqk'
+                VERCEL_PROJECT_ID = 'prj_ZrUZ7N6nBOLNFV5CM4FXsIM7h9d5'
                 VERCEL_TOKEN = credentials('vercel-auth-token')
                 VERCEL_ORG_ID = credentials('vercel-team-id')
             }
