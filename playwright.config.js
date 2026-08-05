@@ -36,8 +36,8 @@ module.exports = defineConfig({
     },
   ],
 
-  /* Automate dev server startup and readiness checks */
-  webServer: {
+  /* Serve the local build only when no deployed environment is targeted */
+  webServer: process.env.CI_ENVIRONMENT_URL ? undefined : {
     command: 'npx serve -s build -l 3000',
     url: 'http://127.0.0.1:3000',
     reuseExistingServer: !process.env.CI,

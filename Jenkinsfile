@@ -160,6 +160,10 @@ pipeline {
                 VERCEL_PROJECT_ID = 'prj_UndDE6RRi5OrZARFCG0eZyyrB9ar'
                 VERCEL_TOKEN = credentials('vercel-auth-token')
                 VERCEL_ORG_ID = credentials('vercel-team-id')
+                // Public production alias. The URL printed by `vercel deploy` is the
+                // generated deployment URL, which sits behind Vercel Deployment
+                // Protection and serves a login page to the tests.
+                PRODUCTION_URL = 'https://simple-web-app-nu.vercel.app'
             }
             steps {
                 echo 'Running Production Post-Deployment Tests...'
@@ -170,9 +174,10 @@ pipeline {
                     npx vercel pull --yes --environment=production --token=$VERCEL_TOKEN
                     npx vercel build --prod --token=$VERCEL_TOKEN
                     npx vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN > production-url.txt
-                    PRODUCTION_URL=$(cat production-url.txt | tail -n 1)
+                    echo "Deployment completed: $(tail -n 1 production-url.txt)"
+
                     export CI_ENVIRONMENT_URL="$PRODUCTION_URL"
-                    echo "Deployment completed."
+                    echo "Testing against the production alias: $CI_ENVIRONMENT_URL"
                     echo "Running tests against the deployed application..."
                     npx playwright test --reporter=html --config=playwright.config.js
                 '''
