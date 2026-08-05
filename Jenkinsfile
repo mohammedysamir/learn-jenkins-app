@@ -3,7 +3,7 @@ pipeline {
     environment {
         NODE_IMAGE = 'node:18-alpine'
         PLAYWRIGHT_IMAGE = 'mcr.microsoft.com/playwright:v1.39.0-jammy'
-        REACT_APP_VERSION = "1.0.$BUILD_ID"
+        REACT_APP_VERSION = "1.0.${BUILD_ID}"
     }
     stages {
         stage('Build') {
@@ -112,7 +112,9 @@ pipeline {
                 sh '''
                     npm install vercel@latest
                     npx vercel --version
-                    npx vercel deploy --token=$VERCEL_TOKEN --yes > staging-url.txt
+                    npx vercel pull --yes --environment=preview --token=$VERCEL_TOKEN
+                    npx vercel build --token=$VERCEL_TOKEN
+                    npx vercel deploy --prebuilt --token=$VERCEL_TOKEN > staging-url.txt
 
                     # Read the output URL into a shell variable
                     STAGING_URL=$(cat staging-url.txt | tail -n 1)
@@ -165,7 +167,9 @@ pipeline {
                 sh '''
                     npm install vercel@latest
                     npx vercel --version
-                    npx vercel deploy  --prod --token=$VERCEL_TOKEN --yes > production-url.txt
+                    npx vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+                    npx vercel build --prod --token=$VERCEL_TOKEN
+                    npx vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN > production-url.txt
                     PRODUCTION_URL=$(cat production-url.txt | tail -n 1)
                     export CI_ENVIRONMENT_URL="$PRODUCTION_URL"
                     echo "Deployment completed."
