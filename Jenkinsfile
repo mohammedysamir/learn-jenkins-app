@@ -3,6 +3,7 @@ pipeline {
     environment {
         NODE_IMAGE = 'node:18-alpine'
         PLAYWRIGHT_IMAGE = 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+        REACT_APP_VERSION = "1.0.$BUILD_ID"
     }
     stages {
         stage('Build') {
@@ -102,6 +103,11 @@ pipeline {
                     reuseNode true
                 }
             }
+            environment {
+                VERCEL_PROJECT_ID = 'prj_qdyHetTH5yH6VNQaZ0AahR67OCqk'
+                VERCEL_TOKEN = credentials('vercel-auth-token')
+                VERCEL_ORG_ID = credentials('vercel-team-id')
+            }
             steps {
                 echo 'Deploying the project to Staging...'
                 sh '''
@@ -131,7 +137,6 @@ pipeline {
                 }
             }
         }
-
         stage('Approving to Deploy to Production') {
             //manual approval to deploy to production with timeout 5 minutes to automatically cancel the deployment
             agent any
@@ -148,6 +153,11 @@ pipeline {
                     image "$PLAYWRIGHT_IMAGE"
                     reuseNode true
                 }
+            }
+            environment {
+                VERCEL_PROJECT_ID = credentials('vercel-simple-app-project-id')
+                VERCEL_TOKEN = credentials('vercel-auth-token')
+                VERCEL_ORG_ID = credentials('vercel-team-id')
             }
             steps {
                 echo 'Running Production Post-Deployment Tests...'
