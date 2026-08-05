@@ -98,7 +98,6 @@ pipeline {
         stage('Deploy to Staging and run Post-Deployment Tests') {
             agent {
                 docker {
-                    image "$NODE_IMAGE"
                     image "$PLAYWRIGHT_IMAGE"
                     reuseNode true
                 }
@@ -114,11 +113,13 @@ pipeline {
                     npm install vercel@latest
                     npx vercel --version
                     npx vercel deploy --token=$VERCEL_TOKEN --yes > staging-url.txt
-                    echo "Deployment to staging is completed: ${env.STAGING_URL}"
-                    CI_ENVIRONMENT_URL="${env.STAGING_URL}"
 
-                    echo "Running tests against the staging-deployed application..."
-                    npx playwright test --reporter=html --config=playwright.config.js
+                    # Read the output URL into a shell variable
+                    STAGING_URL=$(cat staging-url.txt | tail -n 1)
+                    echo "Deployment to staging is completed: $STAGING_URL"
+
+                    export CI_ENVIRONMENT_URL="$STAGING_URL"
+                    echo "Running tests against the staging environment: $CI_ENVIRONMENT_URL"
                 '''
             }
             post {
@@ -149,7 +150,6 @@ pipeline {
         stage('Deploy to Production and run Post-Deployment Tests') {
             agent {
                 docker {
-                    image "$NODE_IMAGE"
                     image "$PLAYWRIGHT_IMAGE"
                     reuseNode true
                 }
@@ -166,7 +166,8 @@ pipeline {
                     npm install vercel@latest
                     npx vercel --version
                     npx vercel deploy  --prod --token=$VERCEL_TOKEN --yes > production-url.txt
-                    CI_ENVIRONMENT_URL="${env.PRODUCTION_URL}"
+                    PRODUCTION_URL=$(cat production-url.txt | tail -n 1)
+                    export CI_ENVIRONMENT_URL="$PRODUCTION_URL"
                     echo "Deployment completed."
                     echo "Running tests against the deployed application..."
                     npx playwright test --reporter=html --config=playwright.config.js
