@@ -155,7 +155,7 @@ pipeline {
                 }
             }
             environment {
-                VERCEL_PROJECT_ID = credentials('vercel-simple-app-project-id')
+                VERCEL_PROJECT_ID = 'prj_UndDE6RRi5OrZARFCG0eZyyrB9ar'
                 VERCEL_TOKEN = credentials('vercel-auth-token')
                 VERCEL_ORG_ID = credentials('vercel-team-id')
             }
