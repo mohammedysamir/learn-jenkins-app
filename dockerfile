@@ -1,3 +1,4 @@
 FROM mcr.microsoft.com/playwright:v1.39.0-jammy
-RUN npm install -g vercel@latest
-RUN npm install -g serve
+RUN npm install -g vercel@latest serve
+RUN apt update
+RUN apt install jq -y
