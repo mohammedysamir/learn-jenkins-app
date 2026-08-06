@@ -6,6 +6,12 @@ pipeline {
         REACT_APP_VERSION = "1.0.${BUILD_ID}"
     }
     stages {
+        stage('Docker') {
+            agent any
+            steps {
+                sh 'docker build -t my-playwright-app .'
+            }
+        }
         stage('Build') {
             agent {
                 docker {
