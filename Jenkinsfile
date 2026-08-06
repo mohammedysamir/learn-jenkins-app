@@ -104,7 +104,7 @@ pipeline {
         stage('Deploy to Staging and run Post-Deployment Tests') {
             agent {
                 docker {
-                    image "$PLAYWRIGHT_IMAGE"
+                    image 'my-playwright-app'
                     reuseNode true
                 }
             }
@@ -116,7 +116,6 @@ pipeline {
             steps {
                 echo 'Deploying the project to Staging...'
                 sh '''
-                    npm install vercel@latest
                     npx vercel --version
                     npx vercel pull --yes --environment=preview --token=$VERCEL_TOKEN
                     npx vercel build --token=$VERCEL_TOKEN
@@ -158,7 +157,7 @@ pipeline {
         stage('Deploy to Production and run Post-Deployment Tests') {
             agent {
                 docker {
-                    image "$PLAYWRIGHT_IMAGE"
+                    image 'my-playwright-app'
                     reuseNode true
                 }
             }
@@ -175,7 +174,6 @@ pipeline {
                 echo 'Running Production Post-Deployment Tests...'
                 echo 'Deploying the project...'
                 sh '''
-                    npm install vercel@latest
                     npx vercel --version
                     npx vercel pull --yes --environment=production --token=$VERCEL_TOKEN
                     npx vercel build --prod --token=$VERCEL_TOKEN
