@@ -11,6 +11,7 @@ pipeline {
             agent {
                 docker {
                     image "$AWS_CLI_IMAGE"
+                    args "--entrypoint=''"
                     reuseNode true
                 }
             }
