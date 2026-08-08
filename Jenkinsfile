@@ -111,7 +111,7 @@ pipeline {
                         ]
                     ) {
                     sh '''
-                        aws s3 sync build/ s3://$AWS_BUCKET_NAME --delete
+                        aws s3 sync . s3://$AWS_BUCKET_NAME --delete
                         aws s3 ls s3://$AWS_BUCKET_NAME
                     '''
                     }
