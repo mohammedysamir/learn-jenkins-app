@@ -8,6 +8,9 @@ pipeline {
     }
     stages {
         stage('AWS') {
+            environment {
+                AWS_BUCKET_NAME = 'learn-jenkins-bucket-8-8-2026'
+            }
             agent {
                 docker {
                     image "$AWS_CLI_IMAGE"
@@ -16,11 +19,19 @@ pipeline {
                 }
             }
             steps {
-                withCredentials([usernamePassword(credentialsId: 'my-aws', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
+                withCredentials(
+                        [
+                            usernamePassword(
+                                credentialsId: 'my-aws',
+                                passwordVariable: 'AWS_SECRET_ACCESS_KEY',
+                                usernameVariable: 'AWS_ACCESS_KEY_ID'
+                            )
+                        ]
+                    ) {
                     sh '''
-                        aws s3 cp s3://learn-jenkins-bucket-8-8-2026/index.html build/index.html
+                        aws s3 cp s3://$AWS_BUCKET_NAME/index.html build/index.html
                     '''
-                }
+                    }
             }
         }
         stage('Build') {
