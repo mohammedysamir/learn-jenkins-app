@@ -30,7 +30,8 @@ pipeline {
                 docker {
                     image "$AWS_CLI_IMAGE"
                     reuseNode true
-                    args "-u root --entrypoint='' -v /var/run/docker.sock:/var/run/docker.sock -v /usr/bin/docker:/usr/bin/docker"                }
+                    args "-u root --entrypoint='' -v /var/run/docker.sock:/var/run/docker.sock"
+                }
             }
             steps {
                 sh '''
