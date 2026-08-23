@@ -35,11 +35,18 @@ pipeline {
             }
             steps {
                 sh '''
-                    echo "Installing Docker CLI..."
-                    yum install -y docker-cli || yum install -y docker
+                    echo "Installing Docker binary..."
+                    if ! command -v docker &> /dev/null; then
+                        curl -fsSL https://download.docker.com/linux/static/stable/x86_64/docker-24.0.7.tgz | tar -xz -C /tmp
+                        mv /tmp/docker/docker /usr/local/bin/
+                        rm -rf /tmp/docker
+                    fi
+
+                    echo "Verifying Docker installation..."
                     docker --version
+
                     echo "Building Docker image..."
-                    docker build -f-t my-jenkins-app:$REACT_APP_VERSION .
+                    docker build -t my-jenkins-app:${REACT_APP_VERSION} .
                 '''
             }
         }
