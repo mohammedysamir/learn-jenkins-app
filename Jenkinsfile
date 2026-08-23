@@ -33,7 +33,15 @@ pipeline {
                 }
             }
             steps {
-                sh '''
+                withCredentials([usernamePassword(credentialsId: 'aws-credentials', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                    sh '''
+                        echo "Setting AWS credentials..."
+                        export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+                        export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+                        export AWS_DEFAULT_REGION=$AWS_REGION
+                    '''
+
+                    sh '''
                     echo "1. Installing extraction dependencies..."
                     yum install -y tar gzip > /dev/null
 
@@ -55,6 +63,7 @@ pipeline {
                     echo "5. Pushing Docker image to ECR..."
                     docker push $AWS_DOCKER_REGISTRY/my-jenkins-app:${REACT_APP_VERSION}
                 '''
+                }
             }
         }
     }
