@@ -39,7 +39,7 @@ pipeline {
                     yum install -y docker-cli || yum install -y docker
                     docker --version
                     echo "Building Docker image..."
-                    docker build -t my-jenkins-app .
+                    docker build -f Dockerfile.jenkins -t my-jenkins-app .
                 '''
             }
         }

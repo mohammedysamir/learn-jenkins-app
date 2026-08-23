@@ -1,0 +1,2 @@
+FROM amazon/aws-cli:2.36.19
+RUN yum install -y docker-cli || yum install -y docker
