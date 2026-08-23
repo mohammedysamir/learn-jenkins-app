@@ -3,7 +3,9 @@ pipeline {
     environment {
         NODE_IMAGE        = 'node:18-alpine'
         AWS_CLI_IMAGE     = 'amazon/aws-cli:2.36.19'
+        AWS_DOCKER_REGISTRY = '390441560074.dkr.ecr.us-east-1.amazonaws.com/learning/learn-jenkins-app'
         REACT_APP_VERSION = "1.0.${BUILD_ID}"
+        AWS_REGION          = 'us-east-1'
     }
     stages {
         stage('Build App') {
@@ -44,7 +46,14 @@ pipeline {
                     docker --version
 
                     echo "4. Building Docker image..."
-                    docker build -t my-jenkins-app:${REACT_APP_VERSION} .
+                    docker build -t $AWS_DOCKER_REGISTRY/my-jenkins-app:${REACT_APP_VERSION} .
+
+                    aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_DOCKER_REGISTRY
+
+                    docker login --username AWS --password-stdin $AWS_DOCKER_REGISTRY <<< $(aws ecr get-login-password --region $AWS_REGION)
+
+                    echo "5. Pushing Docker image to ECR..."
+                    docker push $AWS_DOCKER_REGISTRY/my-jenkins-app:${REACT_APP_VERSION}
                 '''
             }
         }
