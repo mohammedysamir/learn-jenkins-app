@@ -30,13 +30,10 @@ pipeline {
                 docker {
                     image "$AWS_CLI_IMAGE"
                     reuseNode true
-                    args "-u root --entrypoint=''"
-                }
+                    args "-u root --entrypoint='' -v /var/run/docker.sock:/var/run/docker.sock -v /usr/bin/docker:/usr/bin/docker"                }
             }
             steps {
                 sh '''
-                    amazon-linux-extras install docker -y
-                    service docker start
                     docker --version
                     echo "Building Docker image..."
                     docker build -t my-jenkins-app .
